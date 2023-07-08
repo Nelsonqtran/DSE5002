@@ -12,6 +12,9 @@ Assign 10 to the variable x. Assign 5 to the variable y. Assign 20 to the variab
 
 ```{r ex1}
 #your code below
+x <- 10
+y <- 5
+Z <- 20
 
 ```
 
