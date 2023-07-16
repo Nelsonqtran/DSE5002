@@ -2,7 +2,8 @@
 title: "Week 1 Exercises"
 author: "Nelson Tran"
 date: "July 9, 2023"
-
+output: pdf_document
+---
 
 # Exercise 1
 Assign 10 to the variable x. Assign 5 to the variable y. Assign 20 to the variable z.
@@ -11,7 +12,7 @@ Assign 10 to the variable x. Assign 5 to the variable y. Assign 20 to the variab
 #your code below
 x <- 10
 y <- 5
-Z <- 20
+z <- 20
 
 ```
 
@@ -23,7 +24,7 @@ Show that x is less than z but greater than y.
 
 ```{r ex2}
 #your code below
-(x<z)&(x>y)
+(z > x)&(x > y)
 
 ```
 

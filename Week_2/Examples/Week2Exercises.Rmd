@@ -18,7 +18,7 @@ Read the sales_pipe.txt file into an R data frame as sales.
 ```{r}
 # Your code here
 
-sales_csv <- read.csv("Week_2/Data/sales.csv"
+sales_csv <- read.csv("..//Data//sales.csv"
                       ,stringsAsFactors=FALSE
                       )
 

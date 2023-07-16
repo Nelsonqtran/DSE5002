@@ -16,11 +16,14 @@ library(forcats)
 Read the sales_pipe.txt file into an R data frame as sales. 
 
 ```{r}
-# Your code here
+# Your code here'
 
-sales_csv <- read.csv("Week_2/Data/sales.csv"
-                      ,stringsAsFactors=FALSE
-                      )
+sales_pipe <- read.delim("Data/sales_pipe.txt"
+                         ,stringsAsFactors=FALSE
+                         ,sep = "|"
+                         ,fileEncoding = "WINDOWS-1252"
+                         )
+
 
 ```
 
@@ -31,6 +34,10 @@ You can extract a vector of columns names from a data frame using the colnames()
 
 ```{r}
 # Your code here
+
+colnames(sales_pipe)
+
+colnames(sales_pipe)[1] <- "Row.ID"
 
 ```
 
@@ -43,6 +50,27 @@ How many weeks?
 
 ```{r}
 # Your code here
+sales_pipe$Ship.Date = as.Date(sales_pipe$Ship.Date,
+                               format = '%B %d %Y'
+                               )
+
+sales_pipe$Order.Date <- as.Date(sales_pipe$Order.Date
+                                ,format='%m/%d/%Y'
+                                )
+#I believe you can use the function summary too, that would give you the min and max ONLY after you change the data to a date vector?
+summary(sales_pipe)
+max(sales_pipe$Order.Date)
+min(sales_pipe$Order.Date)
+
+time_1 <- "2017-12-30"
+time_2 <- "2014-01-03"
+
+difftime(time_1, time_2, units = "days")
+
+#difftime can't use years as an arg so I used weeks and divided by 52.25 (accounting for leap year) which should result in years
+difftime(time_1, time_2, units = "weeks")/52.25
+
+difftime(time_1, time_2, units = "weeks")
 
 ```
 
@@ -52,6 +80,9 @@ What is the average number of days it takes to ship an order?
 
 ```{r}
 # Your code here
+
+mean(sales_pipe$Ship.Date - sales_pipe$Order.Date)
+
 
 ```
 
@@ -63,6 +94,12 @@ You will need to split the customer name into first and last name segments and t
 ```{r}
 # Your code here
 
+unique(sales_pipe$Customer.Name)
+
+find_bill_df <- stringr::str_split_fixed(string=sales_pipe$Customer.Name,pattern = " ", n=2)
+
+length(find_bill_df [find_bill_df == "Bill"])
+
 ```
 
 # Exercise 6
@@ -72,6 +109,9 @@ How many mentions of the word 'table' are there in the Product.Name column?
 ```{r}
 # Your code here
 
+sum(stringr::str_count(sales_pipe$Product.Name, "table"))
+
+
 ```
 
 # Exercise 7
@@ -80,6 +120,8 @@ Create a table of counts for each state in the sales data. The counts table shou
 ```{r}
 # Your code here
 
+table(sales_pipe$State)
+
 ```
 
 # Exercise 8
@@ -87,6 +129,10 @@ Create an alphabetically ordered barplot for each sales Category in the State of
 
 ```{r}
 # Your code here
+
+texas_df = sales_pipe[sales_pipe$State=='Texas',c("Category")]
+
+barplot(table(texas_df))
 
 ```
 
@@ -97,6 +143,8 @@ Find the average profit by region.
 ```{r}
 # Your code here
 
+aggregate(sales_pipe$Profit, list(sales_pipe$Region), FUN=mean)
+
 ```
 
 # Exercise 10
@@ -105,6 +153,12 @@ Find the average profit by order year.
 
 ```{r}
 # Your code here
+
+order.date.split <- stringr::str_split_fixed(sales_pipe$Order.ID,pattern="-",n=3)
+
+order.date.yr <- order.date.split[,2]
+
+aggregate(sales_pipe$Profit, list(order.date.yr), FUN=mean)
 
 ```
 
