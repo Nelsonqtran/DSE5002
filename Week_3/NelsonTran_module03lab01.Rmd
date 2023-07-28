@@ -73,10 +73,18 @@ Loop the array once to make a hash map of the value to its index. Then loop agai
 *A simple implementation uses two iterations. In the first iteration, we add each element's value as a key and its index as a value to the hash table. Then, in the second iteration, we check if each element's complement (target – nums_vector[i]) exists in the hash table. If it does exist, we return current element's index and its complement's index. Beware that the complement must not be nums_vector[i] itself!*
 
 ```{r}
+  library(hash)
+  h <- hash()
 two_sum <- function(nums_vector,target){
-  #your code here
-  for(i in seq_along(nums_vector))
-  h <- hash((nums_vector) - (target))
+    #your code here
+    for (i in seq_along(nums_vector)){
+      h[nums_vector[i]] <- i
+    }
+ for (i in seq_along(nums_vector)){
+      complement <- target - nums_vector[i]
+        if(complement %in% names.hash(h) && complement != i)
+          print(c(nums_vector[i],complement))
+ }
 }
 
 # Test code
