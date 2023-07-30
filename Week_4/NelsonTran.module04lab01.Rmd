@@ -37,9 +37,12 @@ library(ggplot2)
 data(who)
 data(population)
 
-long_who <- who %>%
-  pivot_longer((cols = starts_with("new_sp_m014")))
-  names_to = c("diagnosis")
+long_who <- who %>% pivot_longer(
+  cols = new_sp_m014:newrel_f65,
+  names_to = c("diagnosis", "gender", "age"),
+  names_pattern = "new_?(.*)_(.)(.*)",
+  values_to = "count"
+)
 
 ```
 
@@ -49,6 +52,9 @@ long_who <- who %>%
 ```{r}
 # your code here
 
+who_left_df = left_join(long_who, population, by = c('country','year'))
+
+
 ```
 
 3) Split the age column into two columns, min age and max age. Notice that there is no character separator. Check the documentation with ?separate to understand other ways to separate the age column. Keep in mind that 0 to 14 is coded as 014 (3 characters) and the other age groups are coded with 4 characters. 65 only has two characters, but we will ignore that until the next prolem. 
@@ -56,12 +62,25 @@ long_who <- who %>%
 ```{r}
 # your code here
 
+who_left_df <- who_left_df %>% 
+  separate(age, 
+           sep = c(-2),
+           into = c("min_age", "max_age"))
+
+
 ```
 
 4) Since we ignored the 65+ group in the previous problem we will fix it here. If you examine the data you will notice that 65 was placed into the max_age column and there is no value for min_age for those records. To fix this use mutate() in order to replace the blank value in the min_age column with the value from the max_age column and another mutate to replace the 65 in the max column with an Inf. Be sure to keep the variables as character vectors.  
 
 ```{r}
 # your code here
+
+who_left_df <- who_left_df %>%
+  mutate(min_age = if_else(min_age == "", max_age, min_age),
+         max_age = if_else(max_age == "65", "Inf", max_age))
+
+who_left_df$min_age = as.character(who_left_df$min_age)
+who_left_df$max_age = as.character(who_left_df$max_age)
 
 ```
 
@@ -72,24 +91,51 @@ long_who <- who %>%
 ```{r}
 # your code here
 
+count_per_diagnosis = who_left_df %>%
+  group_by(gender,diagnosis) %>%
+  summarize(count = sum(count, na.rm = TRUE))
+head(count_per_diagnosis)
+
+
 ```
 
 6) Now create a plot using ggplot and geom_col where your x axis is gender, your y axis represents the counts, and facet by diagnosis. Be sure to give your plot a title and resolve the axis labels. 
 
 ```{r}
 #your code here
+ggplot(who_left_df, aes(x = gender, y = count, fill = gender)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~ diagnosis, scales = "free_y", ncol = 2) +
+  labs(x = "Gender", y = "Counts", fill = "Gender", title = "Counts per Diagnosis by Gender") 
+
 ```
 
 7) Find the percentage of population by year, gender, and diagnosis. Be sure to remove rows containing NA values. 
 
 ```{r}
 # your code here
+
+who_left_df_filtered <- who_left_df %>%
+  na.omit()
+per_pop <- who_left_df_filtered %>%
+  group_by(year, gender, diagnosis) %>%
+  summarize(percentage = sum(count) / sum(population) * 100)
+print(per_pop)
+
 ```
 
 8) Create a line plot in ggplot where your x axis contains the year and y axis contains the percent of world population. Facet this plot by diagnosis with each plot stacked vertically. You should have a line for each gender within each facet. Be sure to format your y axis and give your plot a title. 
 
 ```{r}
 # your code here
+
+ggplot(per_pop) +
+  geom_point(aes(x = year, y = percentage, fill = year)) +
+  geom_smooth(method = "lm", aes(y=percentage, x=year)) +
+  facet_grid(~diagnosis) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(title = 'percentage of diagnosis by year', x= 'Year', y = "percentage")
+  
 ```
 
 9) Now unite the min and max age variables into a new variable named age_range. Use a '-' as the separator. 
@@ -97,11 +143,33 @@ long_who <- who %>%
 ```{r}
 # your code here
 
+who_left_df_filtered <- who_left_df_filtered %>%
+  unite(col = 'age_range', min_age:max_age, sep = '-')
+
 ```
 
 10) Find the percentage contribution of each age group by diagnosis. You will first need to find the count of all diagnoses then find the count of all diagnoses by age group. Join the former to the later and calculate the percent of each age group. Plot these as a geom_col where the x axis is the diagnosis, y axis is the percent of total, and faceted by age group. 
 
 ```{r}
 # your code here
+
+count_all <- who_left_df_filtered %>%
+  group_by(diagnosis) %>%
+  summarize(count_all = sum(count))
+
+age_group_count <- who_left_df_filtered %>%
+  group_by(diagnosis, age_range) %>%
+  summarize(age_group_count = sum(count))
+
+per_diag_age <- count_all %>%
+  left_join(age_group_count, by='diagnosis')
+
+per_diag_age <- per_diag_age %>%
+  mutate(percentage = (age_group_count/count_all)*100)
+
+ggplot(per_diag_age, aes(x = diagnosis, y = percentage, fill = age_range)) +
+  geom_col(position = "dodge2") +
+  facet_wrap(~ age_range, scales = "free_y", ncol = 2) +
+  labs(x = "Diagnosis", y = "Percent of Total", fill = "Age_range", title = "Percent Total Age-Group Per Diagnosis")
 
 ```
