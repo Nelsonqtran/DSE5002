@@ -31,7 +31,8 @@ title_counts <- subset(title_counts, Count > threshold)
 ggplot(title_counts, aes(x = Job_Title, y = Count, fill = Job_Title)) +
   geom_bar(stat = "identity") +
   labs(title = "Count of Job Titles", x = "Job Title", y = "Count") +
-  theme(axis.text.x = element_text(angle = 45)) 
+  scale_x_discrete(labels=scales::label_wrap(10)) +
+  theme(axis.text.x = element_text(angle = 45, size = 8))
 
 #removing least common job titles
 
@@ -112,6 +113,33 @@ ggplot(avg_salary_comp_size, aes(x=company_size, y=average_salary, fill=company_
 
 ```
 ```{r}
+salary_us <- filtered_job_data[filtered_job_data$employee_residence
+                               == "US", "salary_in_usd"]
+salary_other <-filtered_job_data[filtered_job_data$employee_residence
+                               != "US", "salary_in_usd"]
+salary_other <-as.data.frame(salary_other)
+salary_us <- as.data.frame(salary_us)
+
+mean_salary_us <- mean(salary_us$salary_us, na.rm = TRUE)
+print(mean_salary_us)
+
+mean_salary_other <- mean(salary_other$salary_other, na.rm = TRUE)
+print(mean_salary_other)
+
+compared_salary <- data.frame(country = c('US', 'Other Countries'),
+                              mean_salary = c(138199.5, 62546.53))
+
+ggplot(compared_salary, aes(x = country, y = mean_salary, fill = country)) +
+  geom_bar(stat = 'identity') +
+  labs(title = 'US vs. Other Countries Salaries', x = 'Resident Country',
+       y = 'Salary in USD') +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::dollar_format(), breaks = 
+                       c(60000, 90000, 120000, 130000))
+
+```
+
+```{r}
 #Taking out part-time and freelance workers since CEO would most likely hire a full time employee
 Employment_type_to_keep <- c("FT")
 
@@ -130,11 +158,11 @@ filtered_job_data <- filter(filtered_job_data, experience_level %in% exp_level_t
 ```{r}
 #Suggested Salary for Data Science Hire
 
-ggplot(filtered_job_data) +
-  geom_point(aes(x=work_year, y=salary_in_usd, fill=work_year)) +
+ggplot(filtered_job_data, aes(x=work_year, y=salary_in_usd)) +
+  geom_point() +
   geom_smooth(method = "lm", aes(y=salary_in_usd, x=work_year)) +
-  labs(Title = "Average Salary of Experience Level by Year", x= "Year", y="Salary") +
-  facet_grid(~experience_level) + 
+  labs(title = "Suggested Salary for Hire", x= "Year", y="Salary") +
+  facet_grid (~experience_level) +
   scale_y_continuous(labels = scales::dollar_format())+
   theme(axis.text.x = element_text(angle=45))
 
