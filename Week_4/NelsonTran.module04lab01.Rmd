@@ -168,7 +168,7 @@ per_diag_age <- per_diag_age %>%
   mutate(percentage = (age_group_count/count_all)*100)
 
 ggplot(per_diag_age, aes(x = diagnosis, y = percentage, fill = age_range)) +
-  geom_col(position = "dodge2") +
+  geom_col(position = "dodge") +
   facet_wrap(~ age_range, scales = "free_y", ncol = 2) +
   labs(x = "Diagnosis", y = "Percent of Total", fill = "Age_range", title = "Percent Total Age-Group Per Diagnosis")
 
