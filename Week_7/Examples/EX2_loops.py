@@ -18,6 +18,12 @@ for i in range(len(letters)):
     
 letter_list1 == letter_list2
 
+letter_list3 = []
+
+for i, letter in enumerate(letters):
+    print(i)
+    letter_list3.append(letter)
+
 z = 1
 while z < 10:
     z += z * 2
@@ -60,6 +66,27 @@ for key, value in hash_map.items():
    else:
         work_on += 1
         
+for i, value in enumerate(list1):
+    work_on += 1
+    if value == 10:
+        break 
+        """this is how we should troubleshoot code"""  
+    if value in list2:
+        hash_map[i] = list2.index(value)
+        
+for key, value in hash_map.items():
+    print("The value: " + str(list[key]) + " is in both lists")
+    print("Both the elements are the same. " + '\nlist1 indice is: '+ str(key) + '\n list2 indice is: ' + str(j))
+    
+for key, value in hash_map.items():
+   if value == True:
+        for j in range(len(list2)):
+            work_on += 1
+            if list1[key] == list2[j]:
+                print("Both elements are the same. " + '\nlist1 indice is: '+ str(key) + '\n list2 indice is: ' + str(j))
+   else:
+        work_on += 1
+
 print('nested loop number of steps: ' + str(work_on2))
 print('hash map number of steps: ' + str(work_on))
                 

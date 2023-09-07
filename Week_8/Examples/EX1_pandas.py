@@ -28,6 +28,8 @@ print(df[['Country','City']].head())
 
 #subsetting rows
 cat_df = df[df["Category"] =='Furniture']
+#how to reset index for data frame
+cat_df = cat_df.reset.index()
 cat_df.shape
 
 profit_df = df[df["Profit"] < 0 ]

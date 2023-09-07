@@ -7,6 +7,11 @@ Created on Mon Jul  4 13:43:39 2022
 
 def factorial(num=5):#function definition, default value of 5
     #code block that calculates a factorial and assigns it to fact
+    """
+    this function computes a factorial.
+    Arguments:
+        num: number to computer factorial. default value is 5
+    """
     fact=1
     for i in range(1, num+1):#for loop for finding factorial
         fact=fact*i
